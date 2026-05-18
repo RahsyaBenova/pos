@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: May 17, 2026 at 03:35 PM
--- Server version: 8.0.30
--- PHP Version: 8.2.25
+-- Host: 127.0.0.1
+-- Generation Time: May 18, 2026 at 05:52 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -21,20 +21,6 @@ SET time_zone = "+00:00";
 -- Database: `inventory`
 --
 
-CREATE DATABASE IF NOT EXISTS `inventory`;
-USE `inventory`;
-
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS `currentstock`;
-DROP TABLE IF EXISTS `customers`;
-DROP TABLE IF EXISTS `products`;
-DROP TABLE IF EXISTS `purchaseinfo`;
-DROP TABLE IF EXISTS `salesinfo`;
-DROP TABLE IF EXISTS `suppliers`;
-DROP TABLE IF EXISTS `userlogs`;
-DROP TABLE IF EXISTS `users`;
-SET FOREIGN_KEY_CHECKS = 1;
-
 -- --------------------------------------------------------
 
 --
@@ -43,7 +29,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE `currentstock` (
   `productcode` varchar(50) NOT NULL,
-  `quantity` int NOT NULL DEFAULT '0'
+  `quantity` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -51,7 +37,8 @@ CREATE TABLE `currentstock` (
 --
 
 INSERT INTO `currentstock` (`productcode`, `quantity`) VALUES
-('001', 1);
+('001', 100),
+('002', 99);
 
 -- --------------------------------------------------------
 
@@ -60,12 +47,20 @@ INSERT INTO `currentstock` (`productcode`, `quantity`) VALUES
 --
 
 CREATE TABLE `customers` (
-  `cid` int NOT NULL,
+  `cid` int(11) NOT NULL,
   `customercode` varchar(50) NOT NULL,
   `fullname` varchar(100) NOT NULL,
   `location` varchar(150) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `customers`
+--
+
+INSERT INTO `customers` (`cid`, `customercode`, `fullname`, `location`, `phone`) VALUES
+(1, '001', 'Wahyu', 'NBH', '08221138'),
+(10, '002', 'Rendi', 'NBH', '082211321');
 
 -- --------------------------------------------------------
 
@@ -74,7 +69,7 @@ CREATE TABLE `customers` (
 --
 
 CREATE TABLE `products` (
-  `pid` int NOT NULL,
+  `pid` int(11) NOT NULL,
   `productcode` varchar(50) NOT NULL,
   `productname` varchar(100) NOT NULL,
   `costprice` double NOT NULL,
@@ -87,7 +82,8 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`pid`, `productcode`, `productname`, `costprice`, `sellprice`, `brand`) VALUES
-(1, '001', 'Testing', 20000, 35000, 'Testing');
+(1, '001', 'Pencil', 5000, 10000, 'Kenko'),
+(2, '002', 'Bag', 100000, 120000, 'Dora');
 
 -- --------------------------------------------------------
 
@@ -96,13 +92,20 @@ INSERT INTO `products` (`pid`, `productcode`, `productname`, `costprice`, `sellp
 --
 
 CREATE TABLE `purchaseinfo` (
-  `purchaseID` int NOT NULL,
+  `purchaseID` int(11) NOT NULL,
   `suppliercode` varchar(50) NOT NULL,
   `productcode` varchar(50) NOT NULL,
   `date` varchar(50) NOT NULL,
-  `quantity` int NOT NULL,
+  `quantity` int(11) NOT NULL,
   `totalcost` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `purchaseinfo`
+--
+
+INSERT INTO `purchaseinfo` (`purchaseID`, `suppliercode`, `productcode`, `date`, `quantity`, `totalcost`) VALUES
+(1, '001', '001', 'Mon May 18 00:00:00 WIB 2026', 5, 25000);
 
 -- --------------------------------------------------------
 
@@ -111,14 +114,22 @@ CREATE TABLE `purchaseinfo` (
 --
 
 CREATE TABLE `salesinfo` (
-  `salesid` int NOT NULL,
+  `salesid` int(11) NOT NULL,
   `date` varchar(50) NOT NULL,
   `productcode` varchar(50) NOT NULL,
   `customercode` varchar(50) NOT NULL,
-  `quantity` int NOT NULL,
+  `quantity` int(11) NOT NULL,
   `revenue` double NOT NULL,
   `soldby` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `salesinfo`
+--
+
+INSERT INTO `salesinfo` (`salesid`, `date`, `productcode`, `customercode`, `quantity`, `revenue`, `soldby`) VALUES
+(1, 'Mon May 18 10:18:18 WIB 2026', '001', '001', 5, 50000, 'admin'),
+(2, 'Mon May 18 00:00:00 WIB 2026', '002', '001', 1, 120000, 'cashier');
 
 -- --------------------------------------------------------
 
@@ -127,12 +138,19 @@ CREATE TABLE `salesinfo` (
 --
 
 CREATE TABLE `suppliers` (
-  `sid` int NOT NULL,
+  `sid` int(11) NOT NULL,
   `suppliercode` varchar(50) NOT NULL,
   `fullname` varchar(100) NOT NULL,
   `location` varchar(150) DEFAULT NULL,
   `mobile` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `suppliers`
+--
+
+INSERT INTO `suppliers` (`sid`, `suppliercode`, `fullname`, `location`, `mobile`) VALUES
+(1, '001', 'PT SEJAHTERA', 'Cikarang', '082342423523');
 
 -- --------------------------------------------------------
 
@@ -141,7 +159,7 @@ CREATE TABLE `suppliers` (
 --
 
 CREATE TABLE `userlogs` (
-  `logid` int NOT NULL,
+  `logid` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `in_time` varchar(100) DEFAULT NULL,
   `out_time` varchar(100) DEFAULT NULL,
@@ -155,7 +173,7 @@ CREATE TABLE `userlogs` (
 --
 
 CREATE TABLE `users` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `location` varchar(150) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
@@ -170,7 +188,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `name`, `location`, `phone`, `username`, `password`, `usertype`) VALUES
 (1, 'Administrator', 'Headquarters', '00000000', 'admin', 'admin', 'ADMINISTRATOR'),
-(2, 'testing', 'testing', 'testing', 'testing', 'testing', 'ADMINISTRATOR');
+(3, 'Rahsya Benova Akbar', 'Shop', '083242341', 'Cashier', 'cashier', 'CASHIER');
 
 --
 -- Indexes for dumped tables
@@ -236,43 +254,43 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `cid` int NOT NULL AUTO_INCREMENT;
+  MODIFY `cid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `pid` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `pid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `purchaseinfo`
 --
 ALTER TABLE `purchaseinfo`
-  MODIFY `purchaseID` int NOT NULL AUTO_INCREMENT;
+  MODIFY `purchaseID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `salesinfo`
 --
 ALTER TABLE `salesinfo`
-  MODIFY `salesid` int NOT NULL AUTO_INCREMENT;
+  MODIFY `salesid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `suppliers`
 --
 ALTER TABLE `suppliers`
-  MODIFY `sid` int NOT NULL AUTO_INCREMENT;
+  MODIFY `sid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `userlogs`
 --
 ALTER TABLE `userlogs`
-  MODIFY `logid` int NOT NULL AUTO_INCREMENT;
+  MODIFY `logid` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
