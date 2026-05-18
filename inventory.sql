@@ -21,6 +21,20 @@ SET time_zone = "+00:00";
 -- Database: `inventory`
 --
 
+CREATE DATABASE IF NOT EXISTS `inventory`;
+USE `inventory`;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `currentstock`;
+DROP TABLE IF EXISTS `customers`;
+DROP TABLE IF EXISTS `products`;
+DROP TABLE IF EXISTS `purchaseinfo`;
+DROP TABLE IF EXISTS `salesinfo`;
+DROP TABLE IF EXISTS `suppliers`;
+DROP TABLE IF EXISTS `userlogs`;
+DROP TABLE IF EXISTS `users`;
+SET FOREIGN_KEY_CHECKS = 1;
+
 -- --------------------------------------------------------
 
 --
@@ -30,7 +44,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `currentstock` (
   `productcode` varchar(50) NOT NULL,
   `quantity` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `currentstock`
@@ -51,7 +65,7 @@ CREATE TABLE `customers` (
   `fullname` varchar(100) NOT NULL,
   `location` varchar(150) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -66,7 +80,7 @@ CREATE TABLE `products` (
   `costprice` double NOT NULL,
   `sellprice` double NOT NULL,
   `brand` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `products`
@@ -88,7 +102,7 @@ CREATE TABLE `purchaseinfo` (
   `date` varchar(50) NOT NULL,
   `quantity` int NOT NULL,
   `totalcost` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -104,7 +118,7 @@ CREATE TABLE `salesinfo` (
   `quantity` int NOT NULL,
   `revenue` double NOT NULL,
   `soldby` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -118,7 +132,7 @@ CREATE TABLE `suppliers` (
   `fullname` varchar(100) NOT NULL,
   `location` varchar(150) DEFAULT NULL,
   `mobile` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -132,7 +146,7 @@ CREATE TABLE `userlogs` (
   `in_time` varchar(100) DEFAULT NULL,
   `out_time` varchar(100) DEFAULT NULL,
   `location` varchar(150) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -148,7 +162,7 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(100) NOT NULL,
   `usertype` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `users`

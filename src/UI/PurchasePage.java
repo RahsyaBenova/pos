@@ -303,28 +303,57 @@ public class PurchasePage extends javax.swing.JPanel {
     }//GEN-LAST:event_addSuppButtonActionPerformed
 
     private void purchaseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_purchaseButtonActionPerformed
-        productDTO = new Product();
-        if (codeText.getText().equals("") || jDateChooser1.getDate()==null
-                || quantityText.getText().equals(""))
+        if (suppCombo.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(null, "Please add or select a supplier before purchasing.");
+            return;
+        }
+
+        if (codeText.getText().trim().equals("") || jDateChooser1.getDate()==null
+                || quantityText.getText().trim().equals(""))
             JOptionPane.showMessageDialog(null, "Please enter all the required details.");
         else {
-            productDTO.setSuppCode(new ProductPOS().getSuppCode(suppCombo.getSelectedItem().toString()));
-            productDTO.setProdCode(codeText.getText());
+            int purchaseQuantity;
+            double costPrice;
+
             try {
-                ResultSet resultSet = new ProductPOS().getProdName(codeText.getText());
+                purchaseQuantity = Integer.parseInt(quantityText.getText().trim());
+                costPrice = Double.parseDouble(costText.getText().trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid quantity and product cost.");
+                return;
+            }
+
+            if (purchaseQuantity <= 0) {
+                JOptionPane.showMessageDialog(null, "Please enter a quantity greater than 0.");
+                return;
+            }
+
+            ProductPOS productDAO = new ProductPOS();
+            String supplierCode = productDAO.getSuppCode(suppCombo.getSelectedItem().toString());
+            if (supplierCode == null || supplierCode.trim().equals("")) {
+                JOptionPane.showMessageDialog(null, "The selected supplier was not found. Please refresh or add the supplier again.");
+                loadComboBox();
+                return;
+            }
+
+            productDTO = new Product();
+            productDTO.setSuppCode(supplierCode);
+            productDTO.setProdCode(codeText.getText().trim());
+            try {
+                ResultSet resultSet = productDAO.getProdName(codeText.getText().trim());
                 if (resultSet.next()) {
                     //productDTO.setProdName(nameText.getText());
                     productDTO.setDate(jDateChooser1.getDate().toString());
-                    productDTO.setQuantity(Integer.parseInt(quantityText.getText()));
+                    productDTO.setQuantity(purchaseQuantity);
                     //productDTO.setCostPrice(Double.parseDouble(costText.getText()));
                     //productDTO.setSellPrice(Double.parseDouble(sellText.getText()));
                     //productDTO.setBrand(brandText.getText());
-                    Double costPrice = Double.parseDouble(costText.getText());
-                    Double totalCost = costPrice * Integer.parseInt(quantityText.getText());
+                    Double totalCost = costPrice * purchaseQuantity;
                     productDTO.setTotalCost(totalCost);
 
-                    new ProductPOS().addPurchaseDAO(productDTO);
-                    loadDataSet();
+                    if (productDAO.addPurchaseDAO(productDTO)) {
+                        loadDataSet();
+                    }
                 } else
                     JOptionPane.showMessageDialog(null, "This seems to be a new product" +
                             " that hasn't been added yet.\nPlease add this product in the \"Products\" section before proceeding.");

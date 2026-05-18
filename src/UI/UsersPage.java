@@ -59,7 +59,7 @@ public class UsersPage extends javax.swing.JPanel {
 
         jLabel6.setText("Password:");
 
-        userTypeCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ADMINISTRATOR" }));
+        userTypeCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ADMINISTRATOR", "CASHIER" }));
 
         addButton.setText("Add");
         addButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));

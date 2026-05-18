@@ -199,48 +199,52 @@ public class ProductPOS {
     }
 
     // Method to add a new purchase transaction
-    public void addPurchaseDAO(Product productDTO) {
+    public boolean addPurchaseDAO(Product productDTO) {
         try {
-            String query = "INSERT INTO purchaseinfo VALUES(null,?,?,?,?,?)";
-            prepStatement = conn.prepareStatement(query);
-            prepStatement.setString(1, productDTO.getSuppCode());
-            prepStatement.setString(2, productDTO.getProdCode());
-            prepStatement.setString(3, productDTO.getDate());
-            prepStatement.setInt(4, productDTO.getQuantity());
-            prepStatement.setDouble(5, productDTO.getTotalCost());
+            conn.setAutoCommit(false);
 
-            prepStatement.executeUpdate();
+            String query = "INSERT INTO purchaseinfo(suppliercode,productcode,date,quantity,totalcost) VALUES(?,?,?,?,?)";
+            try (PreparedStatement purchaseStatement = conn.prepareStatement(query)) {
+                purchaseStatement.setString(1, productDTO.getSuppCode());
+                purchaseStatement.setString(2, productDTO.getProdCode());
+                purchaseStatement.setString(3, productDTO.getDate());
+                purchaseStatement.setInt(4, productDTO.getQuantity());
+                purchaseStatement.setDouble(5, productDTO.getTotalCost());
+                purchaseStatement.executeUpdate();
+            }
+
+            String stockQuery = "INSERT INTO currentstock(productcode,quantity) VALUES(?,?) "
+                    + "ON DUPLICATE KEY UPDATE quantity=quantity+?";
+            try (PreparedStatement stockStatement = conn.prepareStatement(stockQuery)) {
+                stockStatement.setString(1, productDTO.getProdCode());
+                stockStatement.setInt(2, productDTO.getQuantity());
+                stockStatement.setInt(3, productDTO.getQuantity());
+                stockStatement.executeUpdate();
+            }
+
+            conn.commit();
             JOptionPane.showMessageDialog(null, "Purchase log added.");
+            return true;
         } catch (SQLException throwables) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException rollbackException) {
+                rollbackException.printStackTrace();
+            }
+            JOptionPane.showMessageDialog(null, "Purchase could not be saved. Please check the supplier and product details.");
             throwables.printStackTrace();
-        }
-
-        String prodCode = productDTO.getProdCode();
-        if(checkStock(prodCode)) {
+            return false;
+        } finally {
             try {
-                String query = "UPDATE currentstock SET quantity=quantity+? WHERE productcode=?";
-                prepStatement = conn.prepareStatement(query);
-                prepStatement.setInt(1, productDTO.getQuantity());
-                prepStatement.setString(2, prodCode);
-
-                prepStatement.executeUpdate();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+            } catch (SQLException autoCommitException) {
+                autoCommitException.printStackTrace();
             }
         }
-        else if (!checkStock(prodCode)) {
-            try {
-                String query = "INSERT INTO currentstock VALUES(?,?)";
-                prepStatement = conn.prepareStatement(query);
-                prepStatement.setString(1, productDTO.getProdCode());
-                prepStatement.setInt(2, productDTO.getQuantity());
-
-                prepStatement.executeUpdate();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
-        deleteStock();
     }
 
     // Method to update existing product details

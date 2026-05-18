@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 // Main frame for the application after successful login
 public class Dashboard extends javax.swing.JFrame {
 
+    private static final String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
+
     CardLayout layout;
     String username;
     String fullName;
@@ -25,6 +27,7 @@ public class Dashboard extends javax.swing.JFrame {
         this.username = username;
         this.userDTO = userDTO;
         currentUserSession();
+        applyRolePermissions();
 
         // Panel Layout set to Card Layout to allow switching between different sections
         displayPanel.setLayout(layout);
@@ -56,16 +59,22 @@ public class Dashboard extends javax.swing.JFrame {
         layout.show(displayPanel, "Home");
     }
     public void addUsersPage() {
-        layout.show(displayPanel, "Users");
+        if (requireAdministrator()) {
+            layout.show(displayPanel, "Users");
+        }
     }
     public void addCustPage() {
         layout.show(displayPanel, "Customers");
     }
     public void addProdPage() {
-        layout.show(displayPanel, "Products");
+        if (requireAdministrator()) {
+            layout.show(displayPanel, "Products");
+        }
     }
     public void addSuppPage() {
-        layout.show(displayPanel, "Suppliers");
+        if (requireAdministrator()) {
+            layout.show(displayPanel, "Suppliers");
+        }
     }
     public void addStockPage() {
         layout.show(displayPanel, "Current Stock");
@@ -74,7 +83,9 @@ public class Dashboard extends javax.swing.JFrame {
         layout.show(displayPanel, "Sales");
     }
     public void addPurchasePage() {
-        layout.show(displayPanel, "Purchase");
+        if (requireAdministrator()) {
+            layout.show(displayPanel, "Purchase");
+        }
     }
     public void addLogsPage() {
         layout.show(displayPanel, "Logs");
@@ -341,9 +352,33 @@ public class Dashboard extends javax.swing.JFrame {
 
     // Method to display the user currently logged in
     public void currentUserSession() {
-        User userDTO = new User();
-        new UserPOS().getFullName(userDTO, username);
-        nameLabel.setText("User: " + userDTO.getFullName() + " (ADMINISTRATOR)");
+        User sessionUser = new User();
+        new UserPOS().getFullName(sessionUser, username);
+        userDTO.setFullName(sessionUser.getFullName());
+        userDTO.setUserType(sessionUser.getUserType());
+        nameLabel.setText("User: " + userDTO.getFullName() + " (" + userDTO.getUserType() + ")");
+    }
+
+    private void applyRolePermissions() {
+        if (!isAdministrator()) {
+            prodButton.setVisible(false);
+            suppButton.setVisible(false);
+            purchaseButton.setVisible(false);
+            usersButton.setVisible(false);
+        }
+    }
+
+    private boolean isAdministrator() {
+        return userDTO != null && ROLE_ADMINISTRATOR.equals(userDTO.getUserType());
+    }
+
+    private boolean requireAdministrator() {
+        if (isAdministrator()) {
+            return true;
+        }
+
+        JOptionPane.showMessageDialog(this, "You do not have permission to access this page.");
+        return false;
     }
 
     

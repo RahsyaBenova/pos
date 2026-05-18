@@ -73,6 +73,8 @@ public class UserPOS {
 
             if("ADMINISTRATOR".equals(userType))
                 JOptionPane.showMessageDialog(null, "New administrator added.");
+            else if("CASHIER".equals(userType))
+                JOptionPane.showMessageDialog(null, "New cashier added.");
             else JOptionPane.showMessageDialog(null, "New employee added.");
 
         } catch (Exception ex){
@@ -137,8 +139,13 @@ public class UserPOS {
             String query = "SELECT * FROM users WHERE username='" +username+ "' LIMIT 1";
             resultSet = statement.executeQuery(query);
             String fullName = null;
-            if(resultSet.next()) fullName = resultSet.getString(2);
+            String userType = null;
+            if(resultSet.next()) {
+                fullName = resultSet.getString("name");
+                userType = resultSet.getString("usertype");
+            }
             userDTO.setFullName(fullName);
+            userDTO.setUserType(userType);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
